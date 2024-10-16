@@ -6,12 +6,22 @@
   "scripts": {
     "test": "jest"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "eslint",
+    "eslint-plugin",
+    "comments",
+    "inline-comments"
+  ],
+  "author": "Hainan Zhao <hainzhao@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^8.9.0",
     "@typescript-eslint/parser": "^8.9.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.13",
+    "eslint": "8.57",
+    "jest": "^29.7.0"
   },
   "repository": {
     "type": "git",
@@ -21,9 +31,7 @@
     "url": "https://github.com/HainanZhao/eslint-plugin-param-inline-comments/issues"
   },
   "homepage": "https://github.com/HainanZhao/eslint-plugin-param-inline-comments#readme",
-  "devDependencies": {
-    "@types/jest": "^29.5.13",
-    "eslint": "8.57",
-    "jest": "^29.7.0"
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
   }
 }
