@@ -9,7 +9,7 @@ const ruleTester = new RuleTester({
 });
 
 function getExpectedMsg(paramName, value) {
-  return `Value '${value}' should have an inline comment to document the parameter name`;
+  return `Value '${value}' should have an inline comment /* ${paramName} */`;
 }
 
 describe('param-inline-comments', () => {
