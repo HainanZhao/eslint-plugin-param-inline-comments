@@ -24,25 +24,30 @@ module.exports = {
   }
 };
 ```
+On the other hand, If you want to remove the comments added, use the `no-param-inline-comments` rule instead
+```javascript
+    "param-inline-comments/no-param-inline-comments": "warn"
+```
+
 
 ## Example
 Given the following code:
 
 ```javascript
-function test(a, b) {
+function test(a, b, c, d) {
   // function body
 }
 
-test(1, true);
+test(1, true, null, false);
 ```
 The plugin will enforce the following change:
 
 ```javascript
-function test(a, b) {
+function test(a, b, c, d) {
   // function body
 }
 
-test(1, /* b */ true);
+test(1, /* b */ true, /* c */ null, /* d */ false);
 ```
 
 Contributing
