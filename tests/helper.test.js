@@ -1,7 +1,8 @@
 const {
-  getFunctionParams,
   getFullPath,
   getLocalFunctionParams,
+  isBindOrCall,
+  getFunctionPosition,
 } = require('../lib/rules/helper');
 const ts = require('typescript');
 const fs = require('fs');
@@ -60,6 +61,70 @@ describe('helper.js', () => {
       };
       const result = getLocalFunctionParams(node, context);
       expect(result).toEqual([]);
+    });
+  });
+
+  describe('isBindOrCall', () => {
+    it('should return true for MemberExpression with property name "bind"', () => {
+      const callee = {
+        type: 'MemberExpression',
+        property: {
+          name: 'bind',
+        },
+      };
+      expect(isBindOrCall(callee)).toBe(true);
+    });
+
+    it('should return true for MemberExpression with property name "call"', () => {
+      const callee = {
+        type: 'MemberExpression',
+        property: {
+          name: 'call',
+        },
+      };
+      expect(isBindOrCall(callee)).toBe(true);
+    });
+
+    it('should return false for MemberExpression with property name other than "bind" or "call"', () => {
+      const callee = {
+        type: 'MemberExpression',
+        property: {
+          name: 'apply',
+        },
+      };
+      expect(isBindOrCall(callee)).toBe(false);
+    });
+
+    it('should return false for non-MemberExpression callee', () => {
+      const callee = {
+        type: 'Identifier',
+        name: 'foo',
+      };
+      expect(isBindOrCall(callee)).toBe(false);
+    });
+  });
+
+  describe('getFunctionPosition', () => {
+    it('should return the position of the object when isBindOrCall is true', () => {
+      const callee = {
+        object: {
+          range: [0, 10],
+        },
+        range: [0, 20],
+      };
+      const position = getFunctionPosition(callee, true);
+      expect(position).toBe(9);
+    });
+
+    it('should return the position of the callee when isBindOrCall is false', () => {
+      const callee = {
+        object: {
+          range: [0, 10],
+        },
+        range: [0, 20],
+      };
+      const position = getFunctionPosition(callee, false);
+      expect(position).toBe(19);
     });
   });
 });

@@ -22,43 +22,62 @@ describe('param-inline-comments', () => {
         code: 'function test(a, b = false) {}; test(1);',
       },
       {
-        code: 'function test(a, b = false) {}; test(1, /* b */ true);',
+        code: 'function test(a, b = false) {}; test(/* a */ 1, /* b */ true);',
       },
       {
-        code: 'function test(a, b, c) {}; test(1, /* b */ true, /* c */ false);',
+        code: 'function test(a, b, c) {}; test(/* a */1, /* b */ true, /* c */ false);',
       },
       {
-        code: 'function test(a, b = false, obj) {}; test(1, /* b */ true, /* obj */ null);',
+        code: 'function test(a, b = false, obj) {}; test(/* a */1, /* b */ true, /* obj */ null);',
       },
       // Add more valid code examples
     ],
     invalid: [
       {
-        code: 'function test(num, bool) {}; test(1, false);',
+        code: 'function test(num, bool) {}; test(/* num */ 1, false);',
         errors: [
           {
             message: getExpectedMsg('bool', false),
           },
         ],
-        output: 'function test(num, bool) {}; test(1, /* bool */ false);',
+        output:
+          'function test(num, bool) {}; test(/* num */ 1, /* bool */ false);',
+      },
+      {
+        code: 'function test(num, bool) {}; test(1, /* bool */ false);',
+        errors: [
+          {
+            message: getExpectedMsg('num', 1),
+          },
+        ],
+        output:
+          'function test(num, bool) {}; test(/* num */ 1, /* bool */ false);',
+      },
+      {
+        code: 'function test(num, bool) {}; test(1, false);',
+        errors: [
+          {
+            message: getExpectedMsg('num', 1),
+          },
+          {
+            message: getExpectedMsg('bool', false),
+          },
+        ],
+        output:
+          'function test(num, bool) {}; test(/* num */ 1, /* bool */ false);',
       },
       {
         code: 'function test(num, obj) {}; test(1, null);',
         errors: [
           {
-            message: getExpectedMsg('obj', null),
+            message: getExpectedMsg('num', 1),
           },
-        ],
-        output: 'function test(num, obj) {}; test(1, /* obj */ null);',
-      },
-      {
-        code: 'function test(num, obj) {}; test(1, null);',
-        errors: [
           {
             message: getExpectedMsg('obj', null),
           },
         ],
-        output: 'function test(num, obj) {}; test(1, /* obj */ null);',
+        output:
+          'function test(num, obj) {}; test(/* num */ 1, /* obj */ null);',
       },
       // Add more invalid code examples
     ],
