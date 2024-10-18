@@ -30,6 +30,9 @@ describe('param-inline-comments', () => {
       {
         code: 'function test(a, b = false, obj) {}; test(/* a */1, /* b */ true, /* obj */ null);',
       },
+      {
+        code: 'function test(a, b) {}; const test2 = test.bind(this, /* a */ 1);',
+      },
       // Add more valid code examples
     ],
     invalid: [
