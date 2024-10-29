@@ -39,7 +39,6 @@ function test(a, b, c, d) {
 }
 
 test(1, true, null, false);
-const test2 = test.bind(this, 2);
 ```
 The plugin will enforce the following change:
 
@@ -49,8 +48,6 @@ function test(a, b, c, d) {
 }
 
 test(/* a */ 1, /* b */ true, /* c */ null, /* d */ false);
-
-const test2 = test.bind(this, /* a */ 1);
 ```
 
 Contributing
