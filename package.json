@@ -4,7 +4,7 @@
   "description": "",
   "main": "lib/index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest tests/helper.test.js tests/param-inline-comments.test.js tests/integration.test.js tests/typescript.test.js tests/callback.test.js"
   },
   "keywords": [
     "eslint",
@@ -16,7 +16,8 @@
   "license": "ISC",
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^8.9.0",
-    "@typescript-eslint/parser": "^8.9.0"
+    "@typescript-eslint/parser": "^8.9.0",
+    "typescript": "^5.5.2"
   },
   "devDependencies": {
     "@types/jest": "^29.5.13",

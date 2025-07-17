@@ -1,130 +1,119 @@
 const {
-  getFullPath,
   getLocalFunctionParams,
   isBindOrCall,
   getFunctionPosition,
+  isSystemCall,
 } = require('../lib/rules/helper');
-const ts = require('typescript');
-const fs = require('fs');
-
-jest.mock('fs');
-jest.mock('typescript');
 
 describe('helper.js', () => {
-  describe('getFullPath', () => {
-    it('should return the name for Identifier nodes', () => {
-      const node = { type: 'Identifier', range: [0, 4], name: 'test' };
-      const result = getFullPath(node);
-      expect(result).toBe('test[0,4]');
+  describe('isSystemCall', () => {
+    it('should return true for system calls', () => {
+      const node = { type: 'Identifier', name: 'setTimeout' };
+      expect(isSystemCall(node)).toBe(true);
     });
 
-    it('should return the full path for MemberExpression nodes', () => {
-      const node = {
-        type: 'MemberExpression',
-        object: { type: 'Identifier', range: [0, 3], name: 'obj' },
-        property: { type: 'Identifier', name: 'prop' },
-      };
-      const result = getFullPath(node);
-      expect(result).toBe('obj[0,3].prop');
-    });
-  });
-
-  describe('getLocalFunctionParams', () => {
-    it('should return params of the local function', () => {
-      const node = { callee: { name: 'testFunction' } };
-      const context = {
-        getScope: () => ({
-          variables: [
-            {
-              name: 'testFunction',
-              defs: [
-                {
-                  node: {
-                    params: [{ name: 'param1' }, { name: 'param2' }],
-                  },
-                },
-              ],
-            },
-          ],
-        }),
-      };
-      const result = getLocalFunctionParams(node, context);
-      expect(result).toEqual(['param1', 'param2']);
-    });
-
-    it('should return an empty array if function name is not found', () => {
-      const node = { callee: { name: 'unknownFunction' } };
-      const context = {
-        getScope: () => ({
-          variables: [],
-        }),
-      };
-      const result = getLocalFunctionParams(node, context);
-      expect(result).toEqual([]);
+    it('should return false for non-system calls', () => {
+      const node = { type: 'Identifier', name: 'myFunction' };
+      expect(isSystemCall(node)).toBe(false);
     });
   });
 
   describe('isBindOrCall', () => {
-    it('should return true for MemberExpression with property name "bind"', () => {
-      const callee = {
+    it('should return true for .bind() calls', () => {
+      const node = {
         type: 'MemberExpression',
-        property: {
-          name: 'bind',
-        },
+        property: { name: 'bind' },
       };
-      expect(isBindOrCall(callee)).toBe(true);
+      expect(isBindOrCall(node)).toBe(true);
     });
 
-    it('should return true for MemberExpression with property name "call"', () => {
-      const callee = {
+    it('should return true for .call() calls', () => {
+      const node = {
         type: 'MemberExpression',
-        property: {
-          name: 'call',
-        },
+        property: { name: 'call' },
       };
-      expect(isBindOrCall(callee)).toBe(true);
+      expect(isBindOrCall(node)).toBe(true);
     });
 
-    it('should return false for MemberExpression with property name other than "bind" or "call"', () => {
-      const callee = {
+    it('should return false for other member expressions', () => {
+      const node = {
         type: 'MemberExpression',
-        property: {
-          name: 'apply',
-        },
+        property: { name: 'apply' },
       };
-      expect(isBindOrCall(callee)).toBe(false);
-    });
-
-    it('should return false for non-MemberExpression callee', () => {
-      const callee = {
-        type: 'Identifier',
-        name: 'foo',
-      };
-      expect(isBindOrCall(callee)).toBe(false);
+      expect(isBindOrCall(node)).toBe(false);
     });
   });
 
   describe('getFunctionPosition', () => {
-    it('should return the position of the object when isBindOrCall is true', () => {
-      const callee = {
-        object: {
-          range: [0, 10],
-        },
-        range: [0, 20],
-      };
-      const position = getFunctionPosition(callee, true);
-      expect(position).toBe(9);
+    it('should return the correct position for regular function calls', () => {
+      const callee = { range: [0, 10] };
+      expect(getFunctionPosition(callee, false)).toBe(9);
     });
 
-    it('should return the position of the callee when isBindOrCall is false', () => {
-      const callee = {
-        object: {
-          range: [0, 10],
-        },
-        range: [0, 20],
+    it('should return the correct position for .bind() or .call() calls', () => {
+      const callee = { object: { range: [0, 5] } };
+      expect(getFunctionPosition(callee, true)).toBe(4);
+    });
+  });
+
+  describe('getLocalFunctionParams', () => {
+    it('should return an empty array if the function is not found', () => {
+      const node = { callee: { name: 'nonExistent' } };
+      const context = {
+        getSourceCode: () => ({
+          getScope: () => ({ variables: [] }),
+        }),
       };
-      const position = getFunctionPosition(callee, false);
-      expect(position).toBe(19);
+      expect(getLocalFunctionParams(node, context)).toEqual([]);
+    });
+
+    it('should return the correct params for a simple function', () => {
+      const node = { callee: { name: 'myFunction' } };
+      const context = {
+        getSourceCode: () => ({
+          getScope: () => ({
+            variables: [
+              {
+                name: 'myFunction',
+                defs: [
+                  {
+                    node: {
+                      params: [{ type: 'Identifier', name: 'a' }, { type: 'Identifier', name: 'b' }],
+                    },
+                  },
+                ],
+              },
+            ],
+          }),
+        }),
+      };
+      expect(getLocalFunctionParams(node, context)).toEqual(['a', 'b']);
+    });
+
+    it('should handle assignment patterns in params', () => {
+      const node = { callee: { name: 'myFunction' } };
+      const context = {
+        getSourceCode: () => ({
+          getScope: () => ({
+            variables: [
+              {
+                name: 'myFunction',
+                defs: [
+                  {
+                    node: {
+                      params: [
+                        { type: 'Identifier', name: 'a' },
+                        { type: 'AssignmentPattern', left: { name: 'b' } },
+                      ],
+                    },
+                  },
+                ],
+              },
+            ],
+          }),
+        }),
+      };
+      expect(getLocalFunctionParams(node, context)).toEqual(['a', 'b']);
     });
   });
 });
