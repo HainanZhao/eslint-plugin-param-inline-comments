@@ -1,0 +1,1 @@
+function test_invalid_3(num, bool) {}; test_invalid_3(1, false);

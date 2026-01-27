@@ -1,0 +1,1 @@
+function test(a, b = false) {}; test(1);

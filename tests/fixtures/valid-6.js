@@ -1,0 +1,1 @@
+function test(a, b) {}; const test2 = test.bind(this, /* a */ 1);

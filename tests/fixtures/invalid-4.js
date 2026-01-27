@@ -1,0 +1,1 @@
+function test_invalid_4(num, obj) {}; test_invalid_4(1, null);

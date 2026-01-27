@@ -1,0 +1,1 @@
+function test(a) {}; test(1);
