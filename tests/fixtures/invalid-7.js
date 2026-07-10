@@ -1,0 +1,1 @@
+function toggle(index, enabled) {}; toggle(0, true);

@@ -1,0 +1,1 @@
+const o = { a: 1 }; const s = JSON.stringify(o, null, 2);

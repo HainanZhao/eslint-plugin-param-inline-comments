@@ -1,0 +1,1 @@
+function f(a, b) {}; const x = 'v'; f(x, 'z');

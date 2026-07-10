@@ -1,0 +1,1 @@
+function cb() {}; setTimeout(cb, 1000);

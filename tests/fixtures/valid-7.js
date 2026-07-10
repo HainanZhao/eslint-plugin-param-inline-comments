@@ -1,0 +1,1 @@
+function test(a, b) {}; const t = test.bind(null, 1, true);

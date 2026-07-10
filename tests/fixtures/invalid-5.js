@@ -1,0 +1,1 @@
+const svc = { method(a, b, c) { return a; } }; svc.method('x', 1, true);

@@ -1,0 +1,1 @@
+const m = Math.max(3, 0);

@@ -1,0 +1,1 @@
+function f(a, b) {}; f.apply(null, [1, true]);

@@ -1,0 +1,1 @@
+class Rpc { call(retries, verbose) { return retries; } }; new Rpc().call(3, true);

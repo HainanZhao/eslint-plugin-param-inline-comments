@@ -1,0 +1,1 @@
+function createUser(name, isAdmin, age) {}; createUser('bob', true, 30);
